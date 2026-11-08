@@ -1,5 +1,5 @@
 /* Bump VERSION when changing any cached game file. */
-const VERSION = '2026-11-08-2';
+const VERSION = '2026-11-08-3';
 const PREFIX = `color-exit:${self.registration.scope}:`;
 const CACHE = PREFIX + VERSION;
 const FILES = ['index.html', 'game.js', 'levels.js', 'board-photo.jpg', 'pwa.js', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png'];
