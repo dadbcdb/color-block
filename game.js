@@ -88,3 +88,24 @@ board.addEventListener('touchend',endTouch);
 board.addEventListener('touchcancel',endTouch);
 window.addEventListener('blur',()=>{if(drag)release()});
 $('#undo').onclick=()=>{if(!history.length)return;const h=history.pop();blocks=h.blocks;moves=h.moves;selected=h.selected;$('#win').hidden=true;render();say('한 수 되돌렸어요.')};$('#reset').onclick=()=>start(level);$('#next').onclick=()=>start((level+1)%5);$('#levels').onchange=e=>start(Number(e.target.value));document.querySelectorAll('[data-dir]').forEach(b=>b.onclick=()=>move(...b.dataset.dir.split(',').map(Number)));document.addEventListener('keydown',e=>{if(e.target.tagName==='SELECT')return;const d={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key];if(d){e.preventDefault();move(...d)}});start(0);
+
+
+// Lock native page panning even in embedded browsers with incomplete touch-action support.
+document.addEventListener('touchmove',e=>{
+  if(!e.target.closest?.('dialog[open]')&&e.cancelable)e.preventDefault();
+},{passive:false,capture:true});
+const playarea=document.querySelector('.playarea'),frame=document.querySelector('.frame');
+function fitGameBoard(){
+  const width=playarea.clientWidth-16-24;
+  const height=playarea.clientHeight-16-24;
+  const cell=Math.max(0,Math.min(width/5,height/6));
+  frame.style.width=(cell*5+24)+'px';
+  frame.style.height=(cell*6+24)+'px';
+}
+if(typeof ResizeObserver!=='undefined')new ResizeObserver(fitGameBoard).observe(playarea);
+window.addEventListener('resize',fitGameBoard);
+window.visualViewport?.addEventListener('resize',fitGameBoard);
+requestAnimationFrame(fitGameBoard);
+document.querySelector('#help').onclick=()=>document.querySelector('#help-dialog').showModal();
+document.querySelector('#close-help').onclick=()=>document.querySelector('#help-dialog').close();
+window.scrollTo(0,0);
