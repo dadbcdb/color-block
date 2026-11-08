@@ -1,8 +1,8 @@
 /* Bump VERSION when changing any cached game file. */
-const VERSION = '2026-11-08-5';
+const VERSION = '2026-11-08-6';
 const PREFIX = `color-exit:${self.registration.scope}:`;
 const CACHE = PREFIX + VERSION;
-const FILES = ['index.html', 'editor.html', 'editor.js', 'engine.js', 'map-store.js', 'game.js', 'levels.js', 'board-photo.jpg', 'pwa.js', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png'];
+const FILES = ['index.html', 'editor.html', 'editor.js', 'engine.js', 'block-view.js', 'map-store.js', 'game.js', 'levels.js', 'board-photo.jpg', 'pwa.js', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png'];
 const urls = FILES.map(file => new URL(file, self.registration.scope).href);
 
 self.addEventListener('install', event => {

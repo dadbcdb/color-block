@@ -6,7 +6,7 @@
 
 - 게임: `https://dadbcdb.github.io/color-block/`
 - 맵 에디터: `https://dadbcdb.github.io/color-block/editor.html`
-- 기존 오프라인 버전 업데이트: `https://dadbcdb.github.io/color-block/update.html?release=20261108-5`
+- 기존 오프라인 버전 업데이트: `https://dadbcdb.github.io/color-block/update.html?release=20261108-6`
 
 ## PC에서 맵 만들기
 

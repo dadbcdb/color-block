@@ -26,7 +26,7 @@ function render(){
  const ids=new Set(blocks.map(b=>b.id));for(const el of board.querySelectorAll('.block'))if(!ids.has(el.dataset.id)){if(drag?.id===el.dataset.id)el.hidden=true;else el.remove();}
  for(const b of blocks){let el=Array.from(board.querySelectorAll('.block')).find(el=>el.dataset.id===b.id);if(!el){el=document.createElement('button');el.dataset.id=b.id;board.append(el);}el.hidden=false;el.className='block poly-block'+(selected===b.id?' selected':'');el.setAttribute('aria-label',E.COLORS[b.color].name+' '+b.cells.length+'칸 블록');const d=E.dimensions(b.cells);
   Object.assign(el.style,{left:b.x/currentMap.width*100+'%',top:b.y/currentMap.height*100+'%',width:d.width/currentMap.width*100+'%',height:d.height/currentMap.height*100+'%',background:'transparent',padding:0,boxShadow:'none',display:'block'});
-  if(el.childElementCount!==b.cells.length){el.replaceChildren();for(const [x,y]of b.cells){const tile=document.createElement('span');tile.className='poly-tile';Object.assign(tile.style,{left:'calc('+x/d.width*100+'% + 2px)',top:'calc('+y/d.height*100+'% + 2px)',width:'calc('+100/d.width+'% - 4px)',height:'calc('+100/d.height+'% - 4px)',background:E.COLORS[b.color].hex});const stud=document.createElement('span');stud.className='stud';tile.append(stud);el.append(tile);}}
+  const shapeKey=b.color+JSON.stringify(b.cells);if(el.dataset.shape!==shapeKey){BlockView.paint(el,b.cells,E.COLORS[b.color].hex,'poly-tile');el.dataset.shape=shapeKey;}
  }
  $('#moves').textContent=moves;$('#left').textContent=blocks.length;$('#undo').disabled=!history.length;
 }
