@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f6f5ee">
+<title>컬러 탈출 업데이트</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f6f5ee;color:#243847;font-family:system-ui,sans-serif;min-height:100svh;display:grid;place-items:center;padding:24px}main{max-width:420px;width:100%;background:#fffdf7;padding:28px;border-radius:24px;border:1px solid #dce0d8}h1{font-size:25px;margin:0 0 18px}p{font-size:15px;line-height:1.8}#status{color:#526970;min-height:54px}button,a{font:inherit}button{border:0;border-radius:12px;padding:13px 20px;background:#243847;color:white;cursor:pointer}a{display:inline-block;margin-top:20px;color:#426b9e}small{display:block;margin-top:24px;line-height:1.8;color:#72818a}
+</style>
+</head>
+<body><main><h1>게임을 업데이트합니다</h1><p id="status" role="status" aria-live="polite">최신 게임 파일을 저장하고 있어요. 잠시 기다려주세요.</p><button id="retry" hidden>다시 시도</button><a href="./">게임으로 돌아가기</a><small>스테이지 완료 기록은 유지합니다.<br>업데이트할 때는 인터넷 연결이 필요해요.</small></main>
+<script>
+(() => {
+  const EXPECTED = '2026-11-08-2';
+  const status = document.getElementById('status');
+  const retry = document.getElementById('retry');
+  function waitForActivation(worker) {
+    return new Promise((resolve, reject) => {
+      const timer = setTimeout(() => done(new Error('Timed out')), 30000);
+      function done(error) { clearTimeout(timer); worker.removeEventListener('statechange', changed); error ? reject(error) : resolve(); }
+      function changed() { if (worker.state === 'activated') done(); else if (worker.state === 'redundant') done(new Error('Install failed')); }
+      worker.addEventListener('statechange', changed);
+      changed();
+    });
+  }
+  function verify(worker) {
+    return new Promise((resolve, reject) => {
+      const channel = new MessageChannel();
+      const timer = setTimeout(() => { channel.port1.close(); reject(new Error('No reply')); }, 8000);
+      channel.port1.onmessage = event => { clearTimeout(timer); channel.port1.close(); resolve(event.data); };
+      worker.postMessage({type: 'CHECK_OFFLINE_READY'}, [channel.port2]);
+    });
+  }
+  let busy = false;
+  async function update() {
+    if (busy) return;
+    busy = true; retry.hidden = true;
+    status.textContent = '최신 게임 파일을 저장하고 있어요. 잠시 기다려주세요.';
+    try {
+      if (!window.isSecureContext || !('serviceWorker' in navigator)) throw new Error('Unsupported');
+      const registration = await navigator.serviceWorker.register('./sw.js', {scope: './', updateViaCache: 'none'});
+      await registration.update();
+      const worker = registration.installing || registration.waiting || registration.active;
+      if (!worker) throw new Error('No worker');
+      await waitForActivation(worker);
+      const result = await verify(registration.active || worker);
+      if (!result.ready || result.version !== EXPECTED) throw new Error('Version not ready');
+      status.textContent = '업데이트 완료! 게임을 다시 열고 있어요.';
+      window.location.replace('./?updated=' + EXPECTED);
+    } catch (error) {
+      status.textContent = '업데이트를 완료하지 못했어요. 인터넷을 켜고 다시 시도해주세요.';
+      retry.hidden = false;
+    } finally { busy = false; }
+  }
+  retry.addEventListener('click', update);
+  update();
+})();
+</script></body></html>
